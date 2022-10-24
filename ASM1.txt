@@ -22,17 +22,19 @@ ASM1:
 - Weather Observation Station 7
 	select distinct CITY from STATION where CITY like '%a' or CITY like '%i' or CITY like '%o' or CITY like '%u' or CITY like '%e'
 - Weather Observation Station 8
-
+	select distinct CITY from STATION where (CITY like 'a%' or CITY like 'i%' or CITY like 'o%' or CITY like 'u%' or CITY like 'e%') and (CITY like '%a' or CITY like '%i' or CITY like '%o' or CITY like '%u' or CITY like '%e')
+	// select distinct CITY from STATION where CITY like 'a%a' or CITY like 'i%i' or CITY like 'o%o' or CITY like 'u%u' or CITY like 'e%e'
 - Weather Observation Station 9
-
+	select distinct CITY from STATION where CITY not like '[a,e,i,o,u]%'
 - Weather Observation Station 10
-
+	select distinct CITY from STATION where CITY not like '%[a,e,i,o,u]'
 - Weather Observation Station 11
-
+	select distinct CITY from STATION where CITY not like '%[a,e,i,o,u]' or CITY not like '[a,e,i,o,u]%'
 - Weather Observation Station 12
-
+	select distinct CITY from STATION where CITY not like '%[a,e,i,o,u]' and CITY not like '[a,e,i,o,u]%'
 - Higher Than 75 Marks
-
+	select Name from STUDENTS where Marks > 75 order by right(name,3), ID asc
 - Employee Names
-
+	select name from Employee order by name asc
 - Employee Salaries
+	select name from Employee where months < 10 and salary > 2000 order by employee_id
