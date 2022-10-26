@@ -1,0 +1,89 @@
+Type of Triangle:
+	select case
+	when A + B <= C or A + C <= B or B + C <= A then 'Not A Triangle'
+	when A = B and B = C then 'Equilateral'
+	when A = B or B = C or A = C then 'Isosceles'
+	else 'Scalene'
+	end
+	from TRIANGLES;
+The PADS:
+	select concat(Name,'(',left(Occupation,1),')') from OCCUPATIONS order by Name;
+	select concat('There are a total of ',cnt,' ',lower(Occupation),'s.') from (
+		select Occupation,count(Occupation) as cnt
+		from OCCUPATIONS
+		group by Occupation
+		) b
+	order by cnt,Occupation;
+Occupations:
+	select	Doctor,Professor,Singer,Actor
+	from (
+		select
+			NameOrder,
+			max(case Occupation when 'Doctor' then Name end) as Doctor,
+			max(case Occupation when 'Professor' then Name end) as Professor,
+			max(case Occupation when 'Singer' then Name end) as Singer,
+			max(case Occupation when 'Actor' then Name end) as Actor
+		from (
+            select
+                Occupation,
+                Name,
+                row_number() over(partition by Occupation order by Name ASC) as NameOrder
+            from OCCUPATIONS 
+         ) as NameLists
+		group by NameOrder
+    ) as Names
+Revising Aggregations - The Sum Function:
+	select sum(population) from city where district like 'California'
+Revising Aggregations - The Count Function:
+	select count(name) from city where population > 100000
+Revising Aggregations - Averages:
+	select avg(population) from city where district like 'California'
+Average Population:
+	select round(avg(population)) from city
+Japan Population:
+	select sum(population) from city where countrycode like 'JPN'
+Population Density Difference:
+	select max(population) - min(population) from city
+The Blunder:
+	select ceil(avg(Salary)-avg(replace(Salary,'0',''))) from EMPLOYEES;
+Weather Observation Station 2:
+	select round(sum(lat_n),2) , round(sum(long_w),2) from station 
+Weather Observation Station 13:
+	select truncate(sum(lat_n),4) from station where lat_n between 38.7880 and 137.2345
+Weather Observation Station 14:
+	select truncate(max(lat_n),4) from station where lat_n < 137.2345
+Weather Observation Station 16:
+	select round(long_w,4) from station where lat_n = (select max(lat_n) from station where lat_n < 137.2345)
+Weather Observation Station 18:
+	select round((abs(a-c) + abs(b-d)),4) 
+	from (
+		select min(lat_n) as a, min(long_w) as b, max(lat_n) as c, max(long_w) as d 
+		from station
+		) h
+Weather Observation Station 19:
+	select round(sqrt (power((a -c),2) + power((b-d),2)) ,4)
+	from (
+		select min(lat_n) as a, min(long_w) as b, max(lat_n) as c, max(long_w) as d 
+		from station
+		) h
+Top Competitors:
+	select H.hacker_id, H.name
+    from hackers as H
+        inner join submissions as S
+        on H.hacker_id = S.hacker_id
+        inner join challenges as C
+        on S.challenge_id = C.challenge_id
+        inner join difficulty as D
+        on C.difficulty_level  = D.difficulty_level 
+    where S.score = D.score and C.difficulty_level  = D.difficulty_level 
+    group by H.hacker_id, H.name
+    having count(S.hacker_id) > 1
+    order by count(S.hacker_id) desc, S.hacker_id asc
+Placements:
+	Select S.name
+	from students S 
+		join friends F on S.id = F.id
+		join packages P1 on S.id = P1.id
+		join packages P2 on F.friend_id = P2.id
+	where P2.salary > P1.salary
+	order by P2.salary
