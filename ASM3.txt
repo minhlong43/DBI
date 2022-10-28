@@ -1,17 +1,37 @@
 Weather Observation Station 5:
-
+	(select city, length(city) from station order by length(city) asc , city asc limit 1) 
+	union
+	(select city,length(city) from station order by length(city) desc, city asc limit 1)
 Binary Tree Nodes:
-
+	select n, case
+		when p is null then 'Root' 
+		when(select count(*) from BST where p = a.n) = 0 then 'Leaf'
+		else 'Inner'
+		end
+	from BST a
+	order by n
 New Companies:
-
+	select company_code, founder,
+		(select count(distinct lead_manager_code) from lead_manager where company_code = C.company_code),
+		(select count(distinct senior_manager_code) from senior_manager where company_code = C.company_code),
+		(select count(distinct manager_code) from manager where company_code = C.company_code),
+		(select count(distinct employee_code) from employee where company_code = C.company_code)
+	from company C
+	order by company_code;
 Top Earners:
-
+	select max(months * salary), count(*) from employee where (
+		months * salary) = (select max(months * salary) from employee);
 Weather Observation Station 15:
-
+	select round(long_w,4) from station where lat_n = (select max(lat_n) from STATION where lat_n < 137.2345)
 Weather Observation Station 17:
-
+	select round(long_w,4) from station where lat_n = (select min(lat_n) from STATION where lat_n > 38.7780)
 Weather Observation Station 20:
-
+	select round(lat_n,4)
+	from (select lat_n, row_number() over (order by lat_n) as i 
+		  from station 
+		) AS X
+	where i = ( select round((count(lat_n)+1)/2,0) 
+                from station )
 Population Census:
 
 African Cities:
