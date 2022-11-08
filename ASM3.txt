@@ -1,153 +1,35 @@
 Weather Observation Station 5:
-	(select city, length(city) from station order by length(city) asc , city asc limit 1) 
-	union
-	(select city,length(city) from station order by length(city) desc, city asc limit 1)
+
 Binary Tree Nodes:
-	select n, case
-		when p is null then 'Root' 
-		when(select count(*) from BST where p = a.n) = 0 then 'Leaf'
-		else 'Inner'
-		end
-	from BST a
-	order by n
+
 New Companies:
-	select company_code, founder,
-		(select count(distinct lead_manager_code) from lead_manager where company_code = C.company_code),
-		(select count(distinct senior_manager_code) from senior_manager where company_code = C.company_code),
-		(select count(distinct manager_code) from manager where company_code = C.company_code),
-		(select count(distinct employee_code) from employee where company_code = C.company_code)
-	from company C
-	order by company_code
+
 Top Earners:
-	select max(months * salary), count(*) from employee where (
-		months * salary) = (select max(months * salary) from employee)
+
 Weather Observation Station 15:
-	select round(long_w,4) from station where lat_n = (select max(lat_n) from STATION where lat_n < 137.2345)
+
 Weather Observation Station 17:
-	select round(long_w,4) from station where lat_n = (select min(lat_n) from STATION where lat_n > 38.7780)
+
 Weather Observation Station 20:
-	select round(lat_n,4)
-	from (select lat_n, row_number() over (order by lat_n) as i 
-		  from station 
-		) AS X
-	where i = ( select round((count(lat_n)+1)/2,0) 
-                from station )
+
 Population Census:
-	select sum(city. population) from city
-	inner join country on city.countrycode = country.code where country.continent = 'Asia'
+
 African Cities:
-	select city.name from city
-    inner join country on city.countrycode = country.code where country.continent = 'Africa'
+
 Average Population of Each Continent:
-	select country.continent, floor(avg(city.population)) from country, city 
-	where country.code = city.countrycode 
-	group by country.continent
+
 The Report:
-	select if(grades.grade>=8, students.name, null),grades.grade, students.marks
-	from grades, students
-	where students.marks between grades.min_mark and grades.max_mark
-	order by grades.grade desc, students.name
+
 Ollivander's Inventory:
-	select W.id, P.age, W.coins_needed, W.power 
-	from wands W
-	join wands_property P
-	on (W.code = P.code) 
-	where P.is_evil = 0 and W.coins_needed = (select MIN(coins_needed) 
-                                          from wands X
-                                          join wands_property Y 
-                                          on (X.code = Y.code) 
-                                          where X.power = W.power and Y.age = P.age) 
-	order by W.power desc, P.age desc
+
 Challenges:
-	select H.hacker_id, 
-       H.name, 
-       count(C.challenge_id) as c_count
-	from hackers H
-	join challenges C on C.hacker_id = H.hacker_id
-	group by H.hacker_id, H.name
-	having c_count = 
-		(select count(C2.challenge_id) as c_max
-		 from challenges as C2
-		 group by C2.hacker_id 
-		 order by c_max desc limit 1)
-	or c_count in 
-		(select distinct c_compare as c_unique
-		 from (select H2.hacker_id, 
-					  H2.name, 
-					  count(challenge_id) as c_compare
-			   from hackers H2
-			   join challenges C on C.hacker_id = H2.hacker_id
-			   group by H2.hacker_id, H2.name) counts
-		 group by c_compare
-		 having count(c_compare) = 1)
-	order by c_count desc, H.hacker_id
+
 Contest Leaderboard:
-	select h.hacker_id, h.name, t1.total_score
-	from (
-        select hacker_id, sum(max_score) AS total_score
-          from (
-                select hacker_id, max(score) AS max_score
-                  from Submissions
-                group by hacker_id, challenge_id
-               ) t
-        group by hacker_id
-       ) t1
-	join Hackers h
-    on h.hacker_id = t1.hacker_id
-	where t1.total_score <> 0
-	order by total_score desc, hacker_id
+
 SQL Project Planning:
-	select start_date, min(end_date)
-	from (select start_date from projects
-		  where start_date not in (select end_date from projects)) a
-		  inner join
-		 (select end_date from projects
-		  where end_date not in (select start_date from projects)) b
-	where start_date < end_date
-	group by start_date
-	order by min(end_date) - start_date, start_date
+
 Symmetric Pairs:
-	select X, Y from functions F1
-   		where exists(select * from functions F2 where F2.Y = F1.X
-    		and F2.X = F1.Y and F2.X > F1.X) and (X != Y)
-	union
-	select X,Y from functions F1 where X = Y and 
-    		((select count(*) from functions where X = F1.X and Y = F1.X) > 1)
-      		order by X
+
 Interviews:
-	SELECT A.CONTEST_ID, A.HACKER_ID, A.NAME, 
-        SUM(TOTAL_SUBMISSIONS) AS TOTAL_SUBMISSIONS, 
-        SUM(TOTAL_ACCEPTED_SUBMISSIONS) AS TOTAL_ACCEPTED_SUBMISSIONS,
-        SUM(TOTAL_VIEWS) AS TOTAL_VIEWS,
-        SUM(TOTAL_UNIQUE_VIEWS) AS TOTAL_UNIQUE_VIEWS
-	FROM CONTESTS AS A
-	LEFT JOIN COLLEGES AS B
-    		ON A.CONTEST_ID = B.CONTEST_ID
-	LEFT JOIN CHALLENGES AS C
-   	 ON B.COLLEGE_ID = C.COLLEGE_ID 
-	LEFT JOIN (SELECT CHALLENGE_ID, SUM(TOTAL_VIEWS) AS TOTAL_VIEWS, 
-                  SUM(TOTAL_UNIQUE_VIEWS) AS TOTAL_UNIQUE_VIEWS
-           FROM VIEW_STATS
-           GROUP BY CHALLENGE_ID) AS D 
-    ON C.CHALLENGE_ID = D.CHALLENGE_ID 
-	LEFT JOIN (SELECT CHALLENGE_ID, SUM(TOTAL_SUBMISSIONS) AS TOTAL_SUBMISSIONS, 
-                  SUM(TOTAL_ACCEPTED_SUBMISSIONS) AS TOTAL_ACCEPTED_SUBMISSIONS
-           FROM SUBMISSION_STATS
-           GROUP BY CHALLENGE_ID) AS E
-    ON C.CHALLENGE_ID = E.CHALLENGE_ID
-	GROUP BY A.CONTEST_ID, A.HACKER_ID, A.NAME
-	HAVING (TOTAL_SUBMISSIONS + TOTAL_ACCEPTED_SUBMISSIONS + TOTAL_VIEWS + TOTAL_UNIQUE_VIEWS) > 0 
-	ORDER BY A.CONTEST_ID
+
 15 Days of Learning SQL:
-	SELECT SUBMISSION_DATE,
-	(SELECT COUNT(DISTINCT HACKER_ID)  
- 	FROM SUBMISSIONS S2  
- 	WHERE S2.SUBMISSION_DATE = S1.SUBMISSION_DATE AND    
-	(SELECT COUNT(DISTINCT S3.SUBMISSION_DATE) 
- 	FROM SUBMISSIONS S3 WHERE S3.HACKER_ID = S2.HACKER_ID AND S3.SUBMISSION_DATE < S1.SUBMISSION_DATE) = DATEDIFF(S1.SUBMISSION_DATE , '2016-03-01')),
-	(SELECT HACKER_ID FROM SUBMISSIONS S2 WHERE S2.SUBMISSION_DATE = S1.SUBMISSION_DATE 
-	GROUP BY HACKER_ID ORDER BY COUNT(SUBMISSION_ID) DESC, HACKER_ID LIMIT 1) AS TMP,
-	(SELECT NAME FROM HACKERS WHERE HACKER_ID = TMP)
-	FROM
-	(SELECT DISTINCT SUBMISSION_DATE FROM SUBMISSIONS) S1
-	GROUP BY SUBMISSION_DATE
