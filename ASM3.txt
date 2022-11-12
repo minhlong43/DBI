@@ -1,35 +1,118 @@
 Weather Observation Station 5:
-
+	(select city, length(city) from station order by length(city) asc , city asc limit 1) 
+	union
+	(select city,length(city) from station order by length(city) desc, city asc limit 1)
 Binary Tree Nodes:
-
+	select n, case
+		when p is null then 'Root' 
+		when(select count(*) from BST where p = a.n) = 0 then 'Leaf'
+		else 'Inner'
+		end
+	from BST a
+	order by n
 New Companies:
-
+	select company_code, founder,
+		(select count(distinct lead_manager_code) from lead_manager where company_code = C.company_code),
+		(select count(distinct senior_manager_code) from senior_manager where company_code = C.company_code),
+		(select count(distinct manager_code) from manager where company_code = C.company_code),
+		(select count(distinct employee_code) from employee where company_code = C.company_code)
+	from company C
+	order by company_code;
 Top Earners:
-
+	select max(months * salary), count(*) from employee where (
+		months * salary) = (select max(months * salary) from employee);
 Weather Observation Station 15:
-
+	select round(long_w,4) from station where lat_n = (select max(lat_n) from STATION where lat_n < 137.2345)
 Weather Observation Station 17:
-
+	select round(long_w,4) from station where lat_n = (select min(lat_n) from STATION where lat_n > 38.7780)
 Weather Observation Station 20:
-
+	select round(s.lat_n, 4) 
+	from station AS S
+	where (select count(lat_n) from station where lat_n < s.lat_n ) = (select count(lat_n) from station where lat_n > s.lat_n)
 Population Census:
-
+	select sum(city. population) from city
+	inner join country on city.countrycode = country.code where country.continent = 'Asia'
 African Cities:
-
+	select city.name from city
+    inner join country on city.countrycode = country.code where country.continent = 'Africa'
 Average Population of Each Continent:
-
+	select country.continent, floor(avg(city.population)) from country, city 
+	where country.code = city.countrycode 
+	group by country.continent
 The Report:
-
+	select if(grades.grade>=8, students.name, null),grades.grade, students.marks
+	from grades, students
+	where students.marks between grades.min_mark and grades.max_mark
+	order by grades.grade desc, students.name
 Ollivander's Inventory:
-
+	select W.id, P.age, W.coins_needed, W.power 
+	from wands W
+	join wands_property P
+	on (W.code = P.code) 
+	where P.is_evil = 0 and W.coins_needed = (select MIN(coins_needed) 
+                                          from wands X
+                                          join wands_property Y 
+                                          on (X.code = Y.code) 
+                                          where X.power = W.power and Y.age = P.age) 
+	order by W.power desc, P.age desc
 Challenges:
-
+	select H.hacker_id, 
+       H.name, 
+       count(C.challenge_id) as c_count
+	from hackers H
+	join challenges C on C.hacker_id = H.hacker_id
+	group by H.hacker_id, H.name
+	having c_count = 
+		(select count(C2.challenge_id) as c_max
+		 from challenges as C2
+		 group by C2.hacker_id 
+		 order by c_max desc limit 1)
+	or c_count in 
+		(select distinct c_compare as c_unique
+		 from (select H2.hacker_id, 
+					  H2.name, 
+					  count(challenge_id) as c_compare
+			   from hackers H2
+			   join challenges C on C.hacker_id = H2.hacker_id
+			   group by H2.hacker_id, H2.name) counts
+		 group by c_compare
+		 having count(c_compare) = 1)
+	order by c_count desc, H.hacker_id;
 Contest Leaderboard:
-
+	select h.hacker_id, h.name, t1.total_score
+	from (
+        select hacker_id, sum(max_score) AS total_score
+          from (
+                select hacker_id, max(score) AS max_score
+                  from Submissions
+                group by hacker_id, challenge_id
+               ) t
+        group by hacker_id
+       ) t1
+	join Hackers h
+    on h.hacker_id = t1.hacker_id
+	where t1.total_score <> 0
+	order by total_score desc, hacker_id
 SQL Project Planning:
-
+	select start_date, min(end_date)
+	from (select start_date from projects
+		  where start_date not in (select end_date from projects)) a
+		  inner join
+		 (select end_date from projects
+		  where end_date not in (select start_date from projects)) b
+	where start_date < end_date
+	group by start_date
+	order by min(end_date) - start_date, start_date
 Symmetric Pairs:
-
+	SELECT X, Y FROM FUNCTIONS F1
+    		WHERE EXISTS(SELECT * FROM FUNCTIONS F2 WHERE F2.Y = F1.X
+    		AND F2.X = F1.Y AND F2.X > F1.X) AND (X != Y)
+	UNION
+	SELECT X,Y FROM FUNCTIONS F1 WHERE X = Y AND 
+    		((SELECT COUNT(*) FROM FUNCTIONS WHERE X = F1.X AND Y = F1.X) > 1)
+    		  ORDER BY X
 Interviews:
 
 15 Days of Learning SQL:
+
+
